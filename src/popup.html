@@ -4,12 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CodeScare</title>
+  <!-- Bloody horror font -->
+  <link href="https://fonts.googleapis.com/css2?family=Creepster&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../dist/popup.css">
 </head>
 
 <body>
   <div class="header">
-    <h1>CodeScare</h1>
+    <img src="../assets/logo.png" alt="CodeScare" class="title-img">
     <p>Spooky jumpscare for LeetCode</p>
   </div>
 
@@ -25,7 +27,7 @@
     </label>
   </div>
 
-  <button class="button" id="optionsBtn"> Open Settings</button>
+  <button class="button" id="optionsBtn">Open Settings</button>
   <button class="button" id="playMusicBtn">Play Music</button>
 
   <div class="info">
@@ -33,12 +35,13 @@
   </div>
     
   <h1>Gemini API Key</h1>
-    <form>
-	    <input id="forminput" type='text' value='tempvalue' />
-    </form>
-    <button id="submit_key">Submit</button>
-    <script src="../dist/geminihandler.js"></script>
+  <form>
+    <input id="forminput" type="text" value="tempvalue" />
+  </form>
+  <button id="submit_key">Submit</button>
 
+  <!-- Scripts -->
+  <script src="../dist/geminihandler.js"></script>
   <script src="../dist/popup.js"></script>
 </body>
 </html>
