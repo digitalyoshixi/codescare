@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "build": "esbuild src/popup.js src/geminihandler.js src/content.js --bundle --outdir=dist",
+    "build": "esbuild src/*.js src/*.css --bundle --outdir=dist",
     "watch": "npm run build -- --watch"
   },
   "dependencies": {

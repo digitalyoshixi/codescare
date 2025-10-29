@@ -1,45 +1,41 @@
-console.log("Hello");
+// popup.js - Popup script for LeetScare
 
-document.getElementById('myButton').addEventListener('click', button_click);
+document.addEventListener('DOMContentLoaded', async () => {
+  // Load settings
+  const result = await chrome.storage.sync.get({
+    enabled: true,
+    durationSeconds: 2,
+    volume: 0.8,
+    theme: 'spooky'
+  });
 
-function button_click() {
-  // pass
-  console.log("hello")
-  chrome.tabs.query({active: true, currentWindow: true}, tabs => {
-    chrome.scripting.executeScript({target: {tabId: tabs[0].id}, files: ['content.js']})
-  })
-}
+  // Update UI
+  const enabledCheckbox = document.getElementById('enabled');
+  const statusDiv = document.getElementById('status');
+  const statusText = document.getElementById('statusText');
 
-//window.onload = window_load;
-// function DOMtoString(selector) {
-//   console.log("ENTERING HERE")
-//     if (selector) {
-//         selector = document.querySelector(selector);
-//         if (!selector) return "ERROR: querySelector failed to find node"
-//     } else {
-//         selector = document.documentElement;
-//     }
-//     return selector.outerHTML;
-// }
+  enabledCheckbox.checked = result.enabled;
+  updateStatus(result.enabled);
 
-// function window_load() {
-//   var message = document.querySelector("h1");
-//       chrome.tabs.query({ active: true, currentWindow: true }).then(function (tabs) {
-//         var activeTab = tabs[0];
-//         console.log(activeTab)
-//         var activeTabId = activeTab.id;
-//         console.log(activeTab.id)
-// 
-//         return chrome.scripting.executeScript({
-//             target: { tabId: activeTabId },
-//             // injectImmediately: true,  // uncomment this to make it execute straight away, other wise it will wait for document_idle
-//             func: DOMtoString,
-//             // args: ['body']  // you can use this to target what element to get the html for
-//         });
-// 
-//     }).then(function (results) {
-//         message.innerText = results[0].result;
-//     }).catch(function (error) {
-//         message.innerText = 'There was an error injecting script : \n' + error.message;
-//     });
-// }
+  // Toggle handler
+  enabledCheckbox.addEventListener('change', async (e) => {
+    const enabled = e.target.checked;
+    await chrome.storage.sync.set({ enabled });
+    updateStatus(enabled);
+  });
+
+  function updateStatus(enabled) {
+    if (enabled) {
+      statusDiv.className = 'status enabled';
+      statusText.textContent = '✅ Extension is ON';
+    } else {
+      statusDiv.className = 'status disabled';
+      statusText.textContent = '❌ Extension is OFF';
+    }
+  }
+
+  // Options button
+  document.getElementById('optionsBtn').addEventListener('click', () => {
+    chrome.runtime.openOptionsPage();
+  });
+});
