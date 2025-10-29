@@ -24,16 +24,41 @@
       "js": ["dist/contentScript.js"],
       "css": ["dist/overlay.css"],
       "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://leetcode.com/*"],
+      "js": ["dist/bloodOverlay.js"],
+      "css": ["dist/bloodOverlay.css"],
+      "run_at": "document_idle"
+    }
+    ,
+    {
+      "matches": ["https://leetcode.com/*"],
+      "js": ["dist/spiderOverlay.js"],
+      "css": ["dist/spiderOverlay.css"],
+      "run_at": "document_idle"
     }
   ],
   "web_accessible_resources": [
     {
       "resources": [
         "assets/jumpscare.mp3",
+        "assets/spooky.mp3",
+        "assets/Horror-Long-Version(chosic.com).mp3",
+        "assets/Labyrinth-of-Lost-Dreams-MP3(chosic.com).mp3",
+        "assets/Come-Out-And-Play-Remixed-Royalty-Free(chosic.com).mp3",
         "assets/spider.svg",
-        "assets/icons/*"
+        "assets/icons/*",
+        "assets/blood1.png",
+        "assets/blood2.png",
+        "assets/blood3.png",
+        "assets/spider1.png",
+        "assets/spider2.png",
+        "assets/scary1.png",
+        "assets/scary2.png"
       ],
       "matches": ["https://leetcode.com/*"]
     }
   ]
 }
+

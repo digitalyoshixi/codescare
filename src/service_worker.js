@@ -13,6 +13,44 @@ chrome.runtime.onInstalled.addListener((details) => {
       theme: 'spooky'
     });
   }
+  // On install, if music should be enabled, attempt to start in open LeetCode tabs
+  chrome.storage.sync.get({ musicEnabled: true, musicTrack: 'assets/spooky.mp3', volume: 0.8 }).then(res => {
+    if (res.musicEnabled) {
+      try {
+        chrome.tabs.query({ url: 'https://leetcode.com/*' }, (tabs) => {
+          if (!tabs || tabs.length === 0) return;
+          for (const t of tabs) {
+            try {
+              chrome.scripting.executeScript({
+                target: { tabId: t.id },
+                func: (trackUrl, vol) => {
+                  try {
+                    const url = trackUrl;
+                    let audio = document.getElementById('leetscare-music');
+                    if (!audio) {
+                      audio = document.createElement('audio');
+                      audio.id = 'leetscare-music';
+                      audio.loop = true;
+                      audio.preload = 'auto';
+                      audio.style.display = 'none';
+                      const s = document.createElement('source');
+                      s.src = url;
+                      s.type = 'audio/mpeg';
+                      audio.appendChild(s);
+                      document.body.appendChild(audio);
+                    }
+                    audio.volume = Math.max(0, Math.min(1, vol || 0.8));
+                    audio.play().catch(() => {});
+                  } catch (e) {}
+                },
+                args: [chrome.runtime.getURL(res.musicTrack), res.volume]
+              }).catch(() => {});
+            } catch (e) {}
+          }
+        });
+      } catch (e) {}
+    }
+  }).catch(() => {});
 });
 
 // Handle messages from content scripts or popup

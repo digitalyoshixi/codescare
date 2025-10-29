@@ -23,8 +23,59 @@
   chrome.storage.onChanged.addListener((changes, areaName) => {
     if (areaName === 'sync' && changes.enabled) {
       settings.enabled = changes.enabled.newValue;
+      // toggle dark layer according to enabled
+      if (settings.enabled) addDarkLayer(); else removeDarkLayer();
     }
   });
+  // react to music/dark setting changes
+  chrome.storage.onChanged.addListener((changes, areaName) => {
+    if (areaName === 'sync') {
+      if (changes.musicEnabled) {
+        const en = !!changes.musicEnabled.newValue;
+        if (en) addDarkLayer(); else removeDarkLayer();
+      }
+      if (changes.musicTrack && document.getElementById('leetscare-music')) {
+        const audio = document.getElementById('leetscare-music');
+        const newTrack = chrome.runtime.getURL(changes.musicTrack.newValue);
+        try {
+          if (audio.querySelector('source')) {
+            audio.pause();
+            audio.currentTime = 0;
+            audio.querySelector('source').src = newTrack;
+            audio.load();
+            audio.play().catch(() => {});
+          }
+        } catch (e) {}
+      }
+    }
+  });
+
+  // Handle runtime messages (play/stop background music)
+  try {
+    chrome.runtime.onMessage.addListener((msg, sender, sendResp) => {
+      if (!msg || !msg.action) return;
+      if (msg.action === 'play_music') {
+        // start looping spooky music; accept optional track and volume
+        startBackgroundMusic(msg.track, msg.volume);
+        sendResp && sendResp({ ok: true });
+      } else if (msg.action === 'stop_music') {
+        stopBackgroundMusic();
+        sendResp && sendResp({ ok: true });
+      } else if (msg.action === 'set_dark') {
+        // msg.enabled = true/false
+        if (typeof msg.enabled === 'boolean') {
+          if (msg.enabled) addDarkLayer(); else removeDarkLayer();
+        }
+        sendResp && sendResp({ ok: true });
+      } else if (msg.action === 'set_volume') {
+        // adjust volume of the background music if playing
+        const v = typeof msg.volume === 'number' ? msg.volume : settings.volume;
+        const audio = document.getElementById('leetscare-music');
+        if (audio) audio.volume = Math.max(0, Math.min(1, v));
+        sendResp && sendResp({ ok: true });
+      }
+    });
+  } catch (e) {}
 
   if (!settings.enabled) {
     console.log('[LeetScare] Extension disabled');
@@ -190,6 +241,184 @@
     overlay._hideOverlay = hideOverlay;
   }
 
+  // Background music controls (looping spooky music)
+  function startBackgroundMusic(track, volume) {
+    try {
+      // If already playing, do nothing
+      if (document.getElementById('leetscare-music')) {
+        // If already playing, update volume/track if provided
+        const existing = document.getElementById('leetscare-music');
+        if (typeof volume === 'number') existing.volume = Math.max(0, Math.min(1, volume));
+        if (track) {
+          const s = existing.querySelector('source');
+          if (s && s.src !== chrome.runtime.getURL(track)) {
+            // replace source
+            existing.pause();
+            existing.currentTime = 0;
+            s.src = chrome.runtime.getURL(track);
+            existing.load();
+            existing.play().catch(() => {});
+          }
+        }
+        return;
+      }
+
+      const audio = document.createElement('audio');
+      audio.id = 'leetscare-music';
+      audio.loop = true;
+      audio.preload = 'auto';
+      audio.style.display = 'none';
+
+      const src = document.createElement('source');
+      const asset = track ? track : 'assets/spooky.mp3';
+      src.src = chrome.runtime.getURL(asset);
+      src.type = 'audio/mpeg';
+      audio.appendChild(src);
+
+      document.body.appendChild(audio);
+      audio.volume = Math.max(0, Math.min(1, typeof volume === 'number' ? volume : (settings.volume || 0.8)));
+      audio.play().catch(err => {
+        // Autoplay may fail if not initiated by user gesture; ignore silently
+        console.warn('[LeetScare] background audio play failed:', err);
+      });
+    } catch (e) {
+      console.warn('[LeetScare] startBackgroundMusic error', e);
+    }
+  }
+
+  // Dark layer: adds a semi-transparent darkening layer over the page (non-interactive)
+  function addDarkLayer() {
+    try {
+      if (document.getElementById('leetscare-dark-layer')) return;
+      // style element for any animations/transitions
+      const styleId = '__leetscare_dark_style';
+      if (!document.getElementById(styleId)) {
+        const style = document.createElement('style');
+        style.id = styleId;
+        style.textContent = `#leetscare-dark-layer{position:fixed;inset:0;background:rgba(0,0,0,0.45);pointer-events:none;z-index:2147483630;transition:opacity 0.3s ease;opacity:1;}#leetscare-dark-layer.hidden{opacity:0}`;
+        (document.head || document.documentElement).appendChild(style);
+      }
+
+      const layer = document.createElement('div');
+      layer.id = 'leetscare-dark-layer';
+      // ensure it doesn't capture events
+      layer.className = '';
+      // insert as last child of body so it's above page content but below jumpscare overlay (which has higher z-index)
+      (document.body || document.documentElement).appendChild(layer);
+    } catch (e) {
+      console.warn('[LeetScare] addDarkLayer error', e);
+    }
+  }
+  
+    // Dark layer: adds a semi-transparent darkening layer over the page (non-interactive)
+    // It also implements a mouse-following "spotlight" using CSS variables and requestAnimationFrame.
+    let __leetscare_mouse_handler = null;
+    let __leetscare_mouse_pos = { x: '50%', y: '50%' };
+    let __leetscare_mouse_raf = null;
+
+    function addDarkLayer() {
+      try {
+        if (document.getElementById('leetscare-dark-layer')) return;
+        // style element for any animations/transitions and spotlight support
+        const styleId = '__leetscare_dark_style';
+        if (!document.getElementById(styleId)) {
+          const style = document.createElement('style');
+          style.id = styleId;
+          // Make the spotlight sharper by using a tight gradient stop and removing heavy backdrop blur.
+          // This creates a clear circle (transparent) up to 90px and a quick hard transition to a near-opaque overlay.
+          style.textContent = `
+            #leetscare-dark-layer{
+              position:fixed; inset:0; pointer-events:none; z-index:2147483630; transition:opacity 0.15s ease; opacity:1;
+              /* sharper radial spotlight using CSS variables - narrow transition band */
+              /* lighter overlay: reduce outer alpha so page is less dark outside the spotlight */
+              background: radial-gradient(circle at var(--leetscare-x,50%) var(--leetscare-y,50%),
+                rgba(0,0,0,0) 0px, rgba(0,0,0,0) 90px,
+                rgba(0,0,0,0.55) 96px, rgba(0,0,0,0.55) 100%);
+              backdrop-filter: none; /* reduce blur so the spotlight edge is crisp */
+            }
+            #leetscare-dark-layer.hidden{opacity:0}
+          `;
+          (document.head || document.documentElement).appendChild(style);
+        }
+
+        const layer = document.createElement('div');
+        layer.id = 'leetscare-dark-layer';
+        layer.className = '';
+        (document.body || document.documentElement).appendChild(layer);
+
+        // mouse movement handler: update CSS variables; throttle with rAF
+        __leetscare_mouse_handler = (e) => {
+          // client coordinates
+          const x = (e.clientX || 0) + 'px';
+          const y = (e.clientY || 0) + 'px';
+          __leetscare_mouse_pos = { x, y };
+          if (__leetscare_mouse_raf) return;
+          __leetscare_mouse_raf = requestAnimationFrame(() => {
+            try {
+              const l = document.getElementById('leetscare-dark-layer');
+              if (l) {
+                l.style.setProperty('--leetscare-x', __leetscare_mouse_pos.x);
+                l.style.setProperty('--leetscare-y', __leetscare_mouse_pos.y);
+              }
+            } catch (er) {}
+            __leetscare_mouse_raf = null;
+          });
+        };
+
+        // start listening
+        window.addEventListener('mousemove', __leetscare_mouse_handler, { passive: true });
+        // also update spotlight center on touch (for mobile)
+        window.addEventListener('touchmove', (t) => {
+          if (t.touches && t.touches[0]) {
+            __leetscare_mouse_handler(t.touches[0]);
+          }
+        }, { passive: true });
+      } catch (e) {
+        console.warn('[LeetScare] addDarkLayer error', e);
+      }
+    }
+
+  function removeDarkLayer() {
+    try {
+      const layer = document.getElementById('leetscare-dark-layer');
+      if (layer) layer.remove();
+      const style = document.getElementById('__leetscare_dark_style');
+      if (style) style.remove();
+    } catch (e) {
+      console.warn('[LeetScare] removeDarkLayer error', e);
+    }
+  }
+  
+    function removeDarkLayer() {
+      try {
+        const layer = document.getElementById('leetscare-dark-layer');
+        if (layer) layer.remove();
+        const style = document.getElementById('__leetscare_dark_style');
+        if (style) style.remove();
+        if (__leetscare_mouse_handler) {
+          window.removeEventListener('mousemove', __leetscare_mouse_handler);
+          __leetscare_mouse_handler = null;
+        }
+        if (__leetscare_mouse_raf) {
+          cancelAnimationFrame(__leetscare_mouse_raf);
+          __leetscare_mouse_raf = null;
+        }
+      } catch (e) {
+        console.warn('[LeetScare] removeDarkLayer error', e);
+      }
+    }
+
+  function stopBackgroundMusic() {
+    try {
+      const audio = document.getElementById('leetscare-music');
+      if (!audio) return;
+      audio.pause();
+      audio.remove();
+    } catch (e) {
+      console.warn('[LeetScare] stopBackgroundMusic error', e);
+    }
+  }
+
   // MutationObserver to detect LeetCode error messages
   let errorObserver = null;
   
@@ -275,6 +504,8 @@
   // Setup everything
   function init() {
     if (!settings.enabled) return;
+    // apply dark layer when extension active
+    try { addDarkLayer(); } catch (e) {}
     
     attachButtonListeners();
     setupKeyboardListener();

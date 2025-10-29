@@ -13136,6 +13136,8 @@
   };
 
   // src/geminihandler.js
+  var gemini_ai;
+  console.log(gemini_ai);
   async function get_gemini_key(formvalue) {
     console.log("FUCK YOU ");
     try {
