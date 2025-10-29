@@ -54,8 +54,8 @@
         "assets/blood3.png",
         "assets/spider1.png",
         "assets/spider2.png",
-        "assets/scary1.png",
-        "assets/scary2.png"
+        "assets/scary1.jpg",
+        "assets/scary2.jpg"
       ],
       "matches": ["https://leetcode.com/*"]
     }

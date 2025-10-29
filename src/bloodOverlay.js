@@ -8,10 +8,8 @@
     chrome.runtime.getURL("assets/blood1.png"),
     chrome.runtime.getURL("assets/blood2.png"),
     chrome.runtime.getURL("assets/blood3.png"),
-    chrome.runtime.getURL("assets/scary1.png"),
-    chrome.runtime.getURL("assets/scary2.png")
-
-    
+  chrome.runtime.getURL("assets/scary1.jpg"),
+  chrome.runtime.getURL("assets/scary2.jpg")
   ];
 
   // Generate a blood every second
