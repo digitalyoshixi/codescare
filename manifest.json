@@ -31,7 +31,9 @@
       "resources": [
         "assets/jumpscare.mp3",
         "assets/spider.svg",
-        "assets/icons/*"
+        "assets/icons/*",
+        "assets/jumpscares/*",
+        "assets/jumpscare_audio/*"
       ],
       "matches": ["https://leetcode.com/*"]
     }
