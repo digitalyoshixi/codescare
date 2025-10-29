@@ -1,0 +1,13 @@
+{
+  "scripts": {
+    "build": "esbuild src/geminihandler.js src/content.js --bundle --outdir=dist",
+    "watch": "npm run build -- --watch"
+  },
+  "dependencies": {
+    "@google/genai": "^1.27.0",
+    "@google/generative-ai": "^0.24.1"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.11"
+  }
+}

@@ -5,7 +5,7 @@
   "manifest_version": 3,
   "action": {
     "default_title": "Get scared",
-    "default_popup": "index.html",
+    "default_popup": "geminipage.html",
     "default_icon": "icon.png"
   },
   "permissions": [
