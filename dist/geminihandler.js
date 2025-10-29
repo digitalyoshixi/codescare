@@ -13139,6 +13139,7 @@
   var ai = new GoogleGenAI({});
   document.getElementById("submit_key").addEventListener("click", get_gemini_key);
   function get_gemini_key() {
+    console.log("FUCK YOU ");
     var forminput = document.getElementById("forminput");
     console.log(forminput.value);
   }
