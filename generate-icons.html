@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>LeetScare Icon Generator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    canvas {
+      border: 1px solid #ccc;
+      margin: 10px;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 10px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>LeetScare Icon Generator</h1>
+  <p>Click the button below to generate icon files. Then right-click each canvas and "Save image as" to save as PNG files.</p>
+  
+  <div>
+    <h2>16x16 Icon</h2>
+    <canvas id="icon16" width="16" height="16"></canvas>
+    <button onclick="saveIcon(16)">Save 16x16</button>
+  </div>
+  
+  <div>
+    <h2>48x48 Icon</h2>
+    <canvas id="icon48" width="48" height="48"></canvas>
+    <button onclick="saveIcon(48)">Save 48x48</button>
+  </div>
+  
+  <div>
+    <h2>128x128 Icon</h2>
+    <canvas id="icon128" width="128" height="128"></canvas>
+    <button onclick="saveIcon(128)">Save 128x128</button>
+  </div>
+
+  <script>
+    function drawIcon(canvas, size) {
+      const ctx = canvas.getContext('2d');
+      
+      // Background gradient
+      const gradient = ctx.createLinearGradient(0, 0, size, size);
+      gradient.addColorStop(0, '#667eea');
+      gradient.addColorStop(1, '#764ba2');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, size, size);
+      
+      // Draw spider/web pattern
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = size / 32;
+      ctx.beginPath();
+      
+      // Web lines
+      const center = size / 2;
+      for (let i = 0; i < 8; i++) {
+        const angle = (i * Math.PI) / 4;
+        ctx.moveTo(center, center);
+        ctx.lineTo(
+          center + Math.cos(angle) * (size * 0.4),
+          center + Math.sin(angle) * (size * 0.4)
+        );
+      }
+      ctx.stroke();
+      
+      // Spider body
+      ctx.fillStyle = '#1a1a1a';
+      ctx.beginPath();
+      ctx.arc(center, center, size * 0.15, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Eyes
+      ctx.fillStyle = '#ff0000';
+      ctx.beginPath();
+      ctx.arc(center - size * 0.05, center - size * 0.05, size * 0.03, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(center + size * 0.05, center - size * 0.05, size * 0.03, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Ghost emoji alternative - draw BOO text for larger sizes
+      if (size >= 48) {
+        ctx.fillStyle = '#ffffff';
+        ctx.font = `bold ${size * 0.15}px Arial`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('👻', center, center + size * 0.05);
+      }
+    }
+    
+    function generateAll() {
+      drawIcon(document.getElementById('icon16'), 16);
+      drawIcon(document.getElementById('icon48'), 48);
+      drawIcon(document.getElementById('icon128'), 128);
+    }
+    
+    function saveIcon(size) {
+      const canvas = document.getElementById(`icon${size}`);
+      const link = document.createElement('a');
+      link.download = `${size}.png`;
+      link.href = canvas.toDataURL();
+      link.click();
+    }
+    
+    // Generate on load
+    window.onload = generateAll;
+  </script>
+</body>
+</html>

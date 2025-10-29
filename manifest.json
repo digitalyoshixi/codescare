@@ -1,11 +1,39 @@
 {
-  "name": "Hello Extensions",
-  "description": "Base Level Extension",
-  "version": "1.0",
   "manifest_version": 3,
+  "name": "LeetScare",
+  "version": "0.1.0",
+  "description": "Play a spooky jumpscare overlay on LeetCode when you run/submit code (shows before the error).",
+  "icons": {
+    "16": "assets/icons/16.png",
+    "48": "assets/icons/48.png",
+    "128": "assets/icons/128.png"
+  },
+  "permissions": ["storage", "scripting", "activeTab"],
+  "host_permissions": ["https://leetcode.com/*"],
+  "background": {
+    "service_worker": "src/service_worker.js"
+  },
   "action": {
-    "default_popup": "index.html",
-    "default_icon": "icon.png"
-  }
+    "default_popup": "src/popup.html",
+    "default_title": "LeetScare"
+  },
+  "options_page": "src/options.html",
+  "content_scripts": [
+    {
+      "matches": ["https://leetcode.com/*"],
+      "js": ["src/contentScript.js"],
+      "css": ["src/overlay.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "assets/jumpscare.mp3",
+        "assets/spider.svg",
+        "assets/icons/*"
+      ],
+      "matches": ["https://leetcode.com/*"]
+    }
+  ]
 }
-

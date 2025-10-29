@@ -1,0 +1,31 @@
+# LeetScare .gitignore
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Editor files
+.vscode/
+.idea/
+*.code-workspace
+
+# Logs
+*.log
+npm-debug.log*
+
+# Temporary files
+*.tmp
+*.temp
+
+# Build artifacts (if any)
+dist/
+build/
+
+# Node modules (if using package manager)
+node_modules/
+
+# Note: We're keeping placeholder assets in the repo
+# Replace spooky.mp3 and generate proper icons before production use
