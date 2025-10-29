@@ -401,10 +401,28 @@
 
   // src/geminihandler.js
   document.getElementById("submit_key").addEventListener("click", get_gemini_key);
-  function get_gemini_key() {
+  async function get_gemini_key() {
     console.log("FUCK YOU ");
     var forminput = document.getElementById("forminput");
     console.log(forminput.value);
+    try {
+      const data = { "contents": [{ "parts": [{ "text": "This is a test query to see if API key works" }] }] };
+      const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent", {
+        method: "POST",
+        headers: {
+          "x-goog-api-key": forminput.text,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ input: data })
+      });
+      if (!response.ok) {
+        throw new Error();
+      }
+    } catch (error) {
+      console.log(error);
+      console.log("WRONG KEY");
+    }
+    console.log("AI");
   }
 })();
 /*! Bundled license information:

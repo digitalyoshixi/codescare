@@ -9,7 +9,7 @@
     "128": "assets/icons/128.png"
   },
   "permissions": ["storage", "scripting", "activeTab"],
-  "host_permissions": ["https://leetcode.com/*"],
+  "host_permissions": ["https://leetcode.com/*",  "https://generativelanguage.googleapis.com/*"],
   "background": {
     "service_worker": "dist/service_worker.js"
   },
