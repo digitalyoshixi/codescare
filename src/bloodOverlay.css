@@ -1,0 +1,42 @@
+#blood-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none; 
+  z-index: 999999;
+  overflow: hidden;
+}
+
+.blood {
+  position: absolute;
+  width: 70px;
+  height: auto;
+  opacity: 0.95;
+  transform: rotate(0deg);
+  animation: drip 6s linear forwards;
+  pointer-events: none;
+  /* Improve rendering crispness */
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform-origin: center center;
+  image-rendering: -webkit-optimize-contrast; /* sharpen images where possible */
+  image-rendering: crisp-edges;
+  filter: none; /* ensure no blur filter applied */
+}
+
+@keyframes drip {
+  0% {
+    transform: translateY(-15vh) rotate(0deg);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(120vh) rotate(10deg);
+    opacity: 0;
+  }
+}

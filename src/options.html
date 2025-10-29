@@ -43,6 +43,40 @@
       </select>
     </div>
 
+
+       <div class="background-music">
+      <label for="background-music">Background Music</label>
+      <p class="description">Choose your Background Music</p>
+        <select id="background-music">
+          <option value="assets/spooky.mp3">Spooky (loop)</option>
+          <option value="assets/Horror-Long-Version(chosic.com).mp3">Horror Long Version</option>
+          <option value="assets/Labyrinth-of-Lost-Dreams-MP3(chosic.com).mp3">Labyrinth</option>
+          <option value="assets/Come-Out-And-Play-Remixed-Royalty-Free(chosic.com).mp3">Come Out And Play (Remix)</option>
+          <option value="assets/jumpscare.mp3">Jumpscare (short)</option>
+        </select>
+    </div>
+
+      <div class="setting-group">
+        <label for="musicEnabled">Background music enabled</label>
+        <p class="description">Toggle background music on LeetCode pages (default: ON)</p>
+        <label class="toggle-switch">
+          <input type="checkbox" id="musicEnabled">
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="setting-group">
+        <label>Preview Background Music</label>
+        <p class="description">Play a sample of the selected background track (looped)</p>
+        <button id="playMusicBtn" class="btn">Play Music</button>
+      </div>
+
+    
+
+
+
+
+
     <div class="save-status" id="saveStatus">
       Settings saved!
     </div>
@@ -52,6 +86,10 @@
       <p>Made with 👻 for LeetCode users</p>
     </div>
   </div>
+
+
+
+
 
   <script src="options.js"></script>
 </body>
