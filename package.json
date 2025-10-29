@@ -5,7 +5,10 @@
   },
   "dependencies": {
     "@google/genai": "^1.27.0",
-    "@google/generative-ai": "^0.24.1"
+    "@google/generative-ai": "^0.24.1",
+    "fs": "^0.0.1-security",
+    "util": "^0.12.5",
+    "wav": "^1.0.2"
   },
   "devDependencies": {
     "esbuild": "^0.25.11"
