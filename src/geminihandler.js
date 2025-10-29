@@ -42,36 +42,50 @@ function base64ToArrayBuffer(base64) {
   return bytes.buffer; // returns ArrayBuffer
 }
 
-export async function voice_tts_message(textcontent){
+export async function text_message(codecontent){
   if (gemini_ai){
-    // get the gemini response from the text content, 
     const response = await gemini_ai.models.generateContent({
-      model: "gemini-2.5-flash-preview-tts",
-      contents: [{ parts: [{ text: 'Say cheerfully: Have a wonderful day!' }] }],
+      model: "gemini-2.5-flash",
+      contents: codecontent ,
       config: {
-            responseModalities: ['AUDIO'],
-            speechConfig: {
-               voiceConfig: {
-                  prebuiltVoiceConfig: { voiceName: 'Kore' },
-               },
-            },
+        systemInstruction: "Please explain the logic/syntax errors in this code succintly:",
       },
     });
-
-    const data = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
-    console.log(data)
-    const audioBuffer = base64ToArrayBuffer(data)
-    console.log(audioBuffer)
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    // Create a source node and connect it to the audio context's destination
-    const source = audioContext.createBufferSource();
-    audioContext.decodeAudioData(audioBuffer, (decodedBuffer) => {
-      source.buffer = decodedBuffer;
-      source.connect(audioContext.destination);
-      // Play the audio
-      source.start(0);
-    }, (error) => {
-      console.error("Error decoding audio data:", error);
-    });
+    return response.text
   }
+}
+
+export async function voice_tts_message(textcontent){
+  // NOTE THIS FUNCTION IS BROKEN, DONT USE
+  //if (gemini_ai){
+  //  // get the gemini response from the text content, 
+  //  const response = await gemini_ai.models.generateContent({
+  //    model: "gemini-2.5-flash-preview-tts",
+  //    contents: [{ parts: [{ text: 'Say cheerfully: Have a wonderful day!' }] }],
+  //    config: {
+  //          responseModalities: ['AUDIO'],
+  //          speechConfig: {
+  //             voiceConfig: {
+  //                prebuiltVoiceConfig: { voiceName: 'Kore' },
+  //             },
+  //          },
+  //    },
+  //  });
+
+  //  const data = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+  //  console.log(data)
+  //  const audioBuffer = base64ToArrayBuffer(data)
+  //  console.log(audioBuffer)
+  //  const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  //  // Create a source node and connect it to the audio context's destination
+  //  const source = audioContext.createBufferSource();
+  //  audioContext.decodeAudioData(audioBuffer, (decodedBuffer) => {
+  //    source.buffer = decodedBuffer;
+  //    source.connect(audioContext.destination);
+  //    // Play the audio
+  //    source.start(0);
+  //  }, (error) => {
+  //    console.error("Error decoding audio data:", error);
+  //  });
+  //}
 }

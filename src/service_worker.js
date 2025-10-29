@@ -1,4 +1,7 @@
 // service_worker.js - Background service worker for LeetScare (Manifest V3)
+import { GoogleGenAI } from "@google/genai";
+
+let gemini_ai = null;
 
 // Install event
 chrome.runtime.onInstalled.addListener((details) => {
@@ -54,7 +57,7 @@ chrome.runtime.onInstalled.addListener((details) => {
 });
 
 // Handle messages from content scripts or popup
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
   if (request.action === 'getSettings') {
     chrome.storage.sync.get({
       enabled: true,
@@ -63,6 +66,59 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       theme: 'spooky'
     }).then(sendResponse);
     return true; // Will respond asynchronously
+  }
+  else if (request.action === 'validate_gemini_key') {
+    const apiKey = request.apiKey;
+    try {
+      // Test the API key by making a dummy call
+      const data = {"contents": [{"parts": [{"text": "This is a test query to see if API key works"}]}]};
+      const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent", {
+        method: "POST",
+        headers: {
+          "x-goog-api-key" : apiKey,
+          "Content-Type" : "application/json"
+        },
+        body: JSON.stringify(data)
+      });
+      if (!response.ok) {
+          throw new Error("API key validation failed.");
+      }
+      // If valid, store the key in local storage and initialize gemini_ai
+      await chrome.storage.local.set({ geminiApiKey: apiKey });
+      gemini_ai = new GoogleGenAI({apiKey: apiKey});
+      sendResponse({ ok: true });
+    } catch (error) {
+      console.error("[LeetScare] Gemini API key validation error:", error);
+      sendResponse({ ok: false, error: error.message });
+    }
+    return true;
+  }
+  else if (request.action === 'generate_content') {
+    const content = request.content;
+    if (!gemini_ai) {
+      // Try to load key from storage if not initialized
+      const result = await chrome.storage.local.get(['geminiApiKey']);
+      if (result.geminiApiKey) {
+        gemini_ai = new GoogleGenAI({apiKey: result.geminiApiKey});
+      } else {
+        sendResponse({ ok: false, error: "Gemini AI not initialized. No API key found." });
+        return true;
+      }
+    }
+    try {
+      const response = await gemini_ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: content,
+        config: {
+          systemInstruction: "Please explain the logic/syntax errors in this code succintly:",
+        },
+      });
+      sendResponse({ ok: true, text: response.text });
+    } catch (error) {
+      console.error("[LeetScare] Gemini AI content generation error:", error);
+      sendResponse({ ok: false, error: error.message });
+    }
+    return true;
   }
 });
 

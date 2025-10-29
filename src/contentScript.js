@@ -1,6 +1,9 @@
 // contentScript.js - injected into leetcode pages
 // LeetScare extension: Shows spooky jumpscare when Run/Submit is clicked
 
+import { text_message } from "./geminihandler";
+
+
 (async function() {
   'use strict';
 
@@ -157,6 +160,7 @@
     'fnaf_bonnie.gif',
     'golden.gif',
   ];
+
 
   // Show the spooky overlay
   function showOverlay(durationMs) {
@@ -451,6 +455,20 @@
   }
 
   // Attach listeners to Run/Submit buttons
+  function getAllTextChildren() {
+    const textitems = document.querySelector("#editor > div.flex.flex-1.flex-col.overflow-hidden.pb-2 > div.flex-1.overflow-hidden > div > div > div.overflow-guard > div.monaco-scrollable-element.editor-scrollable.vs-dark > div.lines-content.monaco-editor-background > div.view-lines.monaco-mouse-cursor-text");
+    const texts = [];
+    if (textitems) {
+      const spans = textitems.querySelectorAll('span');
+      spans.forEach(span => {
+        if (span.textContent) {
+          texts.push(span.textContent);
+        }
+      });
+    }
+    return texts.join(" ");
+  }
+  
   function attachButtonListeners() {
     const buttons = findButtons();
     
@@ -460,7 +478,7 @@
         btn.removeEventListener('click', btn._leetscareListener);
       }
       
-      btn._leetscareListener = (ev) => {
+      btn._leetscareListener = async (ev) => {
         if (!settings.enabled || overlayActive) {
           return;
         }
@@ -469,7 +487,9 @@
         try {
           ev.stopPropagation();
         } catch (e) {}
-        
+
+        var mytext = await text_message(getAllTextChildren())
+        console.log(mytext)
         showOverlay((settings.durationSeconds || 2) * 1000);
         
         // Re-trigger click after a short delay to let LeetCode process it
