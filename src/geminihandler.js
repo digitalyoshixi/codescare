@@ -1,5 +1,8 @@
 import { GoogleGenAI } from "@google/genai";
 
+var gemini_ai
+console.log(gemini_ai)
+
 export async function get_gemini_key(formvalue){
   console.log("FUCK YOU ")
   try{
