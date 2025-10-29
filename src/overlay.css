@@ -3,16 +3,14 @@
 #leetscare-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.95);
-  color: white;
+  background: #000000;
   z-index: 2147483647;
   display: flex;
   justify-content: center;
   align-items: center;
-  flex-direction: column;
-  font-family: 'Arial', sans-serif;
-  animation: fadeIn 0.2s ease-in;
-  backdrop-filter: blur(5px);
+  animation: fadeIn 0.1s ease-in;
+  cursor: pointer;
+  overflow: hidden;
 }
 
 @keyframes fadeIn {
@@ -24,223 +22,19 @@
   }
 }
 
-.leetscare-container {
-  position: relative;
+.leetscare-jumpscare-gif {
   width: 100%;
   height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  image-rendering: auto;
 }
 
-.leetscare-center {
-  text-align: center;
-  position: relative;
-  z-index: 2;
-}
-
-.leetscare-spiders {
-  position: relative;
-  width: 400px;
-  height: 400px;
-  margin: 0 auto 20px;
-}
-
-.leetscare-spider {
-  position: absolute;
-  width: 120px;
-  height: 120px;
-  filter: drop-shadow(0 0 10px rgba(255, 0, 0, 0.5));
-}
-
-.spider-1 {
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  animation: crawlDown 3s ease-in-out infinite, float 2s ease-in-out infinite;
-  animation-delay: 0s, 0.5s;
-}
-
-.spider-2 {
-  top: 50%;
-  left: 0;
-  transform: translateY(-50%);
-  animation: crawlRight 3s ease-in-out infinite, float 2s ease-in-out infinite;
-  animation-delay: 0.5s, 0s;
-}
-
-.spider-3 {
-  bottom: 0;
-  right: 0;
-  animation: crawlUp 3s ease-in-out infinite, float 2s ease-in-out infinite;
-  animation-delay: 1s, 1s;
-}
-
-@keyframes crawlDown {
-  0%, 100% {
-    top: 0;
-    transform: translateX(-50%) rotate(0deg);
-  }
-  50% {
-    top: 50%;
-    transform: translateX(-50%) rotate(180deg);
-  }
-}
-
-@keyframes crawlRight {
-  0%, 100% {
-    left: 0;
-    transform: translateY(-50%) rotate(90deg);
-  }
-  50% {
-    left: 50%;
-    transform: translateY(-50%) rotate(270deg);
-  }
-}
-
-@keyframes crawlUp {
-  0%, 100% {
-    bottom: 0;
-    right: 0;
-    transform: rotate(180deg);
-  }
-  50% {
-    bottom: 50%;
-    right: 50%;
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
-.leetscare-web {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 300px;
-  height: 300px;
-  background-image: 
-    radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px),
-    radial-gradient(circle, rgba(255,255,255,0.05) 2px, transparent 2px);
-  background-size: 30px 30px, 60px 60px;
-  background-position: 0 0, 15px 15px;
-  animation: webPulse 2s ease-in-out infinite;
-  opacity: 0.6;
-}
-
-@keyframes webPulse {
-  0%, 100% {
-    transform: translate(-50%, -50%) scale(1);
-    opacity: 0.6;
-  }
-  50% {
-    transform: translate(-50%, -50%) scale(1.1);
-    opacity: 0.8;
-  }
-}
-
-.leetscare-title {
-  font-size: 4rem;
-  font-weight: bold;
-  margin: 20px 0;
-  text-shadow: 
-    0 0 10px rgba(255, 0, 0, 0.8),
-    0 0 20px rgba(255, 0, 0, 0.6),
-    0 0 30px rgba(255, 0, 0, 0.4);
-  animation: titleShake 0.5s ease-in-out infinite;
-  color: #ff0000;
-}
-
-@keyframes titleShake {
-  0%, 100% {
-    transform: translateX(0);
-  }
-  25% {
-    transform: translateX(-5px);
-  }
-  75% {
-    transform: translateX(5px);
-  }
-}
-
-.leetscare-subtitle {
-  font-size: 1.5rem;
-  margin: 10px 0 30px;
-  color: #ff9999;
-  text-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
-}
-
-.leetscare-skip-btn {
-  margin-top: 16px;
-  padding: 12px 24px;
-  font-size: 1rem;
-  background: rgba(255, 255, 255, 0.2);
-  border: 2px solid rgba(255, 255, 255, 0.5);
-  color: white;
-  cursor: pointer;
-  border-radius: 8px;
-  transition: all 0.3s ease;
-  font-weight: bold;
-}
-
-.leetscare-skip-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
-  border-color: rgba(255, 255, 255, 0.8);
-  transform: scale(1.05);
-}
-
-.leetscare-skip-btn:active {
-  transform: scale(0.95);
-}
-
-/* Theme variations */
-.leetscare-theme-spooky .leetscare-title {
-  color: #ff0000;
-}
-
-.leetscare-theme-spooky .leetscare-spider {
-  filter: drop-shadow(0 0 10px rgba(255, 0, 0, 0.5));
-}
-
-/* Less spooky theme */
-.leetscare-theme-mild {
-  background: rgba(0, 0, 0, 0.85);
-}
-
-.leetscare-theme-mild .leetscare-title {
-  color: #ffaa00;
-  text-shadow: 0 0 10px rgba(255, 170, 0, 0.6);
-}
-
-.leetscare-theme-mild .leetscare-spider {
-  filter: drop-shadow(0 0 5px rgba(255, 170, 0, 0.3));
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .leetscare-title {
-    font-size: 2.5rem;
-  }
-  
-  .leetscare-subtitle {
-    font-size: 1.2rem;
-  }
-  
-  .leetscare-spiders {
-    width: 300px;
-    height: 300px;
-  }
-  
-  .leetscare-spider {
-    width: 80px;
-    height: 80px;
-  }
+/* Ensure it covers entire viewport */
+.leetscare-jumpscare-gif {
+  min-width: 100vw;
+  min-height: 100vh;
+  max-width: none;
+  max-height: none;
 }

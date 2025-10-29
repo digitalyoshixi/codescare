@@ -151,6 +151,13 @@
     document.addEventListener('keydown', keyboardHandler, true);
   }
 
+  // Available jumpscare GIFs
+  const jumpscareGIFs = [
+    'chica.gif',
+    'fnaf_bonnie.gif',
+    'golden.gif',
+  ];
+
   // Show the spooky overlay
   function showOverlay(durationMs) {
     if (overlayActive || document.getElementById('leetscare-overlay')) {
@@ -160,59 +167,44 @@
     overlayActive = true;
     const duration = Math.max(500, Math.min(10000, durationMs)); // Clamp between 0.5-10s
 
-    // Create overlay element
+    // Randomly select a jumpscare GIF
+    const randomGIF = jumpscareGIFs[Math.floor(Math.random() * jumpscareGIFs.length)];
+
+    // Create overlay element with random jumpscare
     const overlay = document.createElement('div');
     overlay.id = 'leetscare-overlay';
-    overlay.className = `leetscare-theme-${settings.theme || 'spooky'}`;
     
     overlay.innerHTML = `
-      <div class="leetscare-container">
-        <div class="leetscare-center">
-          <div class="leetscare-spiders">
-            <img src="${chrome.runtime.getURL('assets/spider.svg')}" class="leetscare-spider spider-1" />
-            <img src="${chrome.runtime.getURL('assets/spider.svg')}" class="leetscare-spider spider-2" />
-            <img src="${chrome.runtime.getURL('assets/spider.svg')}" class="leetscare-spider spider-3" />
-          </div>
-          <div class="leetscare-web"></div>
-          <h1 class="leetscare-title">👻 BOO!</h1>
-          <p class="leetscare-subtitle">Your code has been spooked!</p>
-          <button id="leetscare-skip" class="leetscare-skip-btn">Skip</button>
-        </div>
-      </div>
-      <audio id="leetscare-audio" preload="auto" loop>
+      <img src="${chrome.runtime.getURL(`assets/jumpscares/${randomGIF}`)}" class="leetscare-jumpscare-gif" alt="Jumpscare" />
+      <audio id="leetscare-audio" preload="auto">
         <source src="${chrome.runtime.getURL('assets/jumpscare.mp3')}" type="audio/mpeg">
       </audio>
     `;
 
     document.body.appendChild(overlay);
 
-    // Setup audio - play immediately since triggered by user interaction
+    // Setup audio - play immediately (audio will fail silently if file doesn't exist)
     const audio = overlay.querySelector('#leetscare-audio');
-    if (audio) {
+    if (audio && settings.volume > 0) {
       audio.volume = Math.max(0, Math.min(1, settings.volume || 0.8));
       
-      // Since this is triggered by user click, autoplay should work
+      // Play audio immediately (no delay)
       audio.play().catch(err => {
-        console.log('[LeetScare] Audio play failed:', err);
-        // Try again after a small delay
-        setTimeout(() => {
-          audio.play().catch(e => console.log('[LeetScare] Audio retry failed:', e));
-        }, 100);
+        // Silently fail if audio file doesn't exist - that's okay
+        console.log('[LeetScare] Audio play failed (may not exist):', err);
       });
     }
 
-    // Dismiss handlers
-    const skipBtn = overlay.querySelector('#leetscare-skip');
-    if (skipBtn) {
-      skipBtn.addEventListener('click', hideOverlay);
-    }
-
+    // Dismiss handlers - Esc key
     const escHandler = (e) => {
       if (e.key === 'Escape' || e.keyCode === 27) {
         hideOverlay();
       }
     };
     window.addEventListener('keydown', escHandler);
+    
+    // Also dismiss on click anywhere
+    overlay.addEventListener('click', hideOverlay);
 
     // Auto hide after duration
     const timeoutId = setTimeout(hideOverlay, duration);
