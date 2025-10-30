@@ -11,6 +11,10 @@ A spooky Chrome extension that injects a jumpscare overlay on LeetCode when you 
 - 🛡️ **Safe & Opt-in**: Fully client-side, no external servers, easy to disable
 - 🎨 **Themes**: Choose between Spooky (classic) and Mild (less intense)
 
+Here are the revised installation steps for your Chrome extension’s README, replacing step 2 and streamlining the process for an npm-based build workflow:
+
+***
+
 ## Installation
 
 ### Prerequisites
@@ -26,19 +30,22 @@ A spooky Chrome extension that injects a jumpscare overlay on LeetCode when you 
    cd codescare
    ```
 
-2. **Prepare assets** (optional, but recommended):
-   - **Icons**: Open `generate-icons.html` in your browser and save the generated icons to `assets/icons/` as `16.png`, `48.png`, and `128.png`
-   - **Audio**: Replace `assets/spooky.mp3` with an actual MP3 audio file (2-3 seconds, <500KB recommended)
-     - You can find free spooky sounds at [freesound.org](https://freesound.org) or [zapsplat.com](https://zapsplat.com)
-     - Keep the filename as `spooky.mp3`
+2. **Install dependencies and build the extension**
+   - Open the `codescare` directory in your terminal.
+   - Run the following commands:
+     ```bash
+     npm install
+     npm run build
+     ```
+   - This will install required packages and build the extension files.
 
-3. **Load the extension**:
+3. **Load the extension in Chrome**
    - Open Chrome and navigate to `chrome://extensions/`
    - Toggle **Developer mode** (top-right corner)
    - Click **Load unpacked**
-   - Select the `codescare` directory
+   - Select the generated build (or `dist`) directory inside `codescare`
 
-4. **Verify installation**:
+4. **Verify installation**
    - You should see "LeetScare" in your extensions list
    - The extension icon should appear in your toolbar
 
